@@ -1,4 +1,4 @@
-# XIVLauncher AutoOTP
+#  XIVLauncher AutoOTP   [![Build XIVLauncher AutoOTP](https://github.com/Knightmore/XIVLauncherAutoOTP/actions/workflows/main.yml/badge.svg)](https://github.com/Knightmore/XIVLauncherAutoOTP/actions/workflows/main.yml)
 
 This command line tool will help you to automate your login with XIVLauncher and activated OTP through following steps:
 
