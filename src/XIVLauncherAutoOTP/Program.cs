@@ -49,7 +49,7 @@ namespace XIVLauncher_AutoOTP
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("");
+                    Console.WriteLine("No credentials for the username " + Username + "found.");
                     throw;
                 }
 
@@ -83,7 +83,6 @@ namespace XIVLauncher_AutoOTP
         }
 
         public static bool Encrypted;
-        public static bool UseXLOTP;
 
         public static bool PortInUse(int port)
         {
@@ -101,7 +100,6 @@ namespace XIVLauncher_AutoOTP
                     break;
                 }
             }
-
 
             return inUse;
         }
@@ -121,7 +119,7 @@ namespace XIVLauncher_AutoOTP
                     return subkey.GetValue("InstallLocation") as string;
                 }
             }
-            
+
             return null;
         }
 
@@ -307,11 +305,6 @@ namespace XIVLauncher_AutoOTP
                     {
                         Username = arg.Substring(arg.IndexOf("=") + 1);
                         Console.WriteLine("Logging in as: " + Username);
-                    }
-
-                    if (arg.StartsWith("--useXLOTP"))
-                    {
-                        UseXLOTP = true;
                     }
                 }
 
