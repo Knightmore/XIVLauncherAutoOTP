@@ -76,8 +76,9 @@ namespace XIVLauncher_AutoOTP
                 }
 
                 var credential = (new NetworkCredential { UserName = Username, Password = value }).ToICredential();
-                credential.TargetName = $"FINAL FANTASY XIV-{Username.ToLower()}-OTP";
-                credential.Comment    = Encrypted ? "Encrypted" : "Plain";
+                credential.TargetName  = $"FINAL FANTASY XIV-{Username.ToLower()}-OTP";
+                credential.Comment     = Encrypted ? "Encrypted" : "Plain";
+                credential.Persistance = Persistance.Enterprise;
                 credential.SaveCredential();
             }
         }
