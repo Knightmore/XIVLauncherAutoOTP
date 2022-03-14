@@ -176,7 +176,7 @@ namespace XIVLauncher_AutoOTP
                 System.Threading.Thread.Sleep(1000);
             }
 
-            _ = new HttpClient().GetAsync($"http://localhost:4646/ffxivlauncher/{otp}");
+            _ = new HttpClient().GetAsync($"http://localhost:4646/ffxivlauncher/{otp}").Result;
         }
 
         static string AsteriskCredentials(bool otp)
