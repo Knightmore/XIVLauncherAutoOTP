@@ -23,6 +23,7 @@
  */
 
 using System;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
@@ -55,11 +56,10 @@ namespace XIVLauncher_AutoOTP
 
                 if (icredential != null)
                 {
-                    if (icredential.Comment == "Encrypted")
-                    {
-                        Encrypted = true;
-                        return icredential.ToNetworkCredential().Password;
-                    }
+                    Encrypted = bool.Parse(icredential.Comment.Substring(0, icredential.Comment.IndexOf("-", StringComparison.Ordinal)));
+                    Steam     = bool.Parse(icredential.Comment.Substring(icredential.Comment.IndexOf("-", StringComparison.Ordinal) + 1));
+                    return icredential.ToNetworkCredential().Password;
+
                 }
 
                 return string.Empty;
@@ -77,13 +77,15 @@ namespace XIVLauncher_AutoOTP
 
                 var credential = (new NetworkCredential { UserName = Username, Password = value }).ToICredential();
                 credential.TargetName  = $"FINAL FANTASY XIV-{Username.ToLower()}-OTP";
-                credential.Comment     = Encrypted ? "Encrypted" : "Plain";
+                credential.Comment     = $"{Encrypted.ToString()}-{Steam.ToString()}";
                 credential.Persistance = Persistance.Enterprise;
                 credential.SaveCredential();
             }
         }
 
         public static bool Encrypted;
+
+        public static bool Steam;
 
         public static bool PortInUse(int port)
         {
@@ -134,6 +136,14 @@ namespace XIVLauncher_AutoOTP
             }
 
             launcherPath = launcherPath + "\\XIVLauncher.exe";
+
+            string  launcherConfig = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\XIVLauncher\\launcherConfigV3.json";
+            string  json           = File.ReadAllText(launcherConfig);
+            dynamic jsonObj        = Newtonsoft.Json.JsonConvert.DeserializeObject(json);
+            jsonObj["AutologinEnabled"] = "true";
+            string output = Newtonsoft.Json.JsonConvert.SerializeObject(jsonObj, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText(launcherConfig, output);
+
             var secretKey = OTP;
             Totp totp;
 
@@ -170,7 +180,7 @@ namespace XIVLauncher_AutoOTP
             }
 
             var otp = totp.ComputeTotp();
-            System.Diagnostics.Process.Start(launcherPath, $"--Username={Username}");
+            System.Diagnostics.Process.Start(launcherPath, $"--account={Username.ToLower()}-True-{Steam.ToString()}");
             while (!PortInUse(4646))
             {
                 System.Threading.Thread.Sleep(1000);
@@ -207,6 +217,19 @@ namespace XIVLauncher_AutoOTP
 
         static void AddCredentials()
         {
+            Console.WriteLine("Are you using Steam? (Y/N)");
+            switch (Console.ReadLine()?.ToUpper())
+            {
+                case "Y":
+                    Steam = true;
+                    break;
+                case "N":
+                    Steam = false;
+                    break;
+                default:
+                    return;
+            }
+
             Console.WriteLine("(RECOMMENDED) Do you want to encrypt your key? (Y/N)");
             switch (Console.ReadLine()?.ToUpper())
             {
