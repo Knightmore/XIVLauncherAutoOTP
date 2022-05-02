@@ -50,7 +50,7 @@ namespace XIVLauncher_AutoOTP
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("No credentials for the username " + Username + "found.");
+                    Console.WriteLine($"No credentials for the username {Username} found.");
                     throw;
                 }
 
@@ -149,7 +149,7 @@ namespace XIVLauncher_AutoOTP
 
             if (Encrypted)
             {
-                var base32Bytes = Base32Encoding.ToBytes(DPAPI.Unprotect(OTP, DataProtectionScope.CurrentUser, AsteriskCredentials(false)));
+                var base32Bytes = Base32Encoding.ToBytes(DPAPI.Unprotect(secretKey, DataProtectionScope.CurrentUser, AsteriskCredentials(false)));
                 totp = new Totp(base32Bytes);
             }
             else
@@ -159,6 +159,10 @@ namespace XIVLauncher_AutoOTP
             }
 
             var otp = totp.ComputeTotp();
+
+            Console.WriteLine();
+            Console.WriteLine($"OTP: {otp}");
+
             System.Diagnostics.Process.Start(launcherPath, $"--account={Username.ToLower()}-True-{Steam.ToString()}");
             while (!PortInUse(4646))
             {
@@ -178,7 +182,7 @@ namespace XIVLauncher_AutoOTP
             {
                 var keyInfo = Console.ReadKey(intercept: true);
                 key = keyInfo.Key;
-
+                
                 if (key == ConsoleKey.Backspace && pass.Length > 0)
                 {
                     Console.Write("\b \b");
@@ -191,7 +195,7 @@ namespace XIVLauncher_AutoOTP
                 }
             } while (key != ConsoleKey.Enter);
 
-            return key.ToString();
+            return pass;
         }
 
         static void AddCredentials()
